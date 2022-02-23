@@ -11,23 +11,19 @@ class Example extends Phaser.Scene
         this.load.image('background', 'gradient8.png');
         this.load.image('face', 'face.png');
         this.load.image('coin', 'coin-small.png');
-        this.load.image('grid', 'grid.png'); // 1
-        this.load.image('baddie', 'baddie2.png'); // 1
+        this.load.image('grid', 'grid.png');
+        this.load.image('baddie', 'baddie2.png');
     }
 
     create ()
     {
         this.add.image(400, 300, 'background');
-        this.add.image(400, 420, 'grid'); // 1
+        this.add.image(400, 420, 'grid');
 
         this.faces = this.add.container();
 
         this.createRandomFaces(10);
 
-        //  1 - add loader + grid image
-        //  2 - add arcade physics to game config
-
-        //  3 - add sprite + world bounds + setVelocity
         this.boss = this.physics.add.sprite(400, 300, 'baddie');
 
         this.boss.setCollideWorldBounds(true, 1, 1);
@@ -37,7 +33,6 @@ class Example extends Phaser.Scene
 
         this.boss.setVelocity(velocityX, velocityY);
 
-        //  4 - add world bounds event
         this.boss.body.onWorldBounds = true;
 
         this.physics.world.on('worldbounds', (body, up, down, left, right) => {
@@ -53,7 +48,6 @@ class Example extends Phaser.Scene
 
         });
 
-        //  5 - make boss interactive
         this.boss.setInteractive();
 
         this.boss.on('pointerdown', () => this.clickBaddie());
@@ -73,11 +67,8 @@ class Example extends Phaser.Scene
 
         this.scoreText.setText('Score: ' + this.score);
 
-        //  6 - camera fx
         this.cameras.main.flash(250, 255, 0, 0);
         this.cameras.main.shake(500);
-
-        //  7 - see gameOver
     }
 
     update ()
@@ -87,10 +78,51 @@ class Example extends Phaser.Scene
 
     gameOver ()
     {
-        this.faces.setVisible(false);
+        //  Remove these:
+        // this.faces.setVisible(false);
+        // this.boss.setVisible(false);
 
-        //  7 - hide boss
-        this.boss.setVisible(false);
+        //  Add this:
+        this.tweens.add({
+            targets: [ this.faces, this.boss, this.scoreText ],
+            alpha: 0,
+            duration: 1500
+        });
+
+        const serverUrl = 'https://3if5ttlzhabf.usemoralis.com:2053/server';
+        const appId = 'lTjCzjvr1AcnXUp8vcpAadOJFgpb5mY7JDnoX8aJ';
+        const btc = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599';
+
+        Moralis.start({ serverUrl, appId });
+
+        const options = { chain: 'eth', address: btc };
+
+        Moralis.Web3API.token.getTokenPrice(options).then(e => {
+
+            console.log(e);
+
+            const btcPrice = e.usdPrice;
+
+            const winnings = Math.trunc(this.score * btcPrice);
+
+            const won = this.add.text(400, 0, `You Won\n$${winnings}!\n😜`, { font: '96px Arial', align: 'center' }).setOrigin(0.5);
+
+            this.tweens.add({
+                targets: won,
+                y: 300,
+                ease: 'Bounce.out',
+                duration: 1000
+            });
+
+            this.time.addEvent({ delay: 500, loop: true, callback: () => {
+
+                const x = Phaser.Math.Between(50, 750);
+                const y = Phaser.Math.Between(50, 550);
+                    
+                this.particles.emitParticleAt(x, y);
+
+            } });
+        });
     }
 
     createRandomFaces (qty)
