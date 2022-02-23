@@ -82,13 +82,14 @@ class Example extends Phaser.Scene
         // this.faces.setVisible(false);
         // this.boss.setVisible(false);
 
-        //  Add this:
+        //  1
         this.tweens.add({
             targets: [ this.faces, this.boss, this.scoreText ],
             alpha: 0,
             duration: 1500
         });
 
+        //  2
         const serverUrl = 'https://3if5ttlzhabf.usemoralis.com:2053/server';
         const appId = 'lTjCzjvr1AcnXUp8vcpAadOJFgpb5mY7JDnoX8aJ';
         const btc = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599';
@@ -97,16 +98,19 @@ class Example extends Phaser.Scene
 
         const options = { chain: 'eth', address: btc };
 
-        Moralis.Web3API.token.getTokenPrice(options).then(e => {
+        // https://docs.moralis.io/moralis-server/web3-sdk/token#gettokenprice
 
-            console.log(e);
+        Moralis.Web3API.token.getTokenPrice(options).then(event => {
 
-            const btcPrice = e.usdPrice;
+            // console.log(event);
+
+            const btcPrice = event.usdPrice;
 
             const winnings = Math.trunc(this.score * btcPrice);
 
             const won = this.add.text(400, 0, `You Won\n$${winnings}!\n😜`, { font: '96px Arial', align: 'center' }).setOrigin(0.5);
 
+            //  3
             this.tweens.add({
                 targets: won,
                 y: 300,
@@ -114,6 +118,7 @@ class Example extends Phaser.Scene
                 duration: 1000
             });
 
+            //  4
             this.time.addEvent({ delay: 500, loop: true, callback: () => {
 
                 const x = Phaser.Math.Between(50, 750);
@@ -122,6 +127,8 @@ class Example extends Phaser.Scene
                 this.particles.emitParticleAt(x, y);
 
             } });
+
+            //  5 - To conclude, could make Elon much faster and add more Pauls
         });
     }
 
