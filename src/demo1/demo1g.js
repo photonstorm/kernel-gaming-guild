@@ -10,34 +10,42 @@ class Example extends Phaser.Scene
         this.load.setPath('../assets');
         this.load.image('background', 'gradient8.png');
         this.load.image('face', 'face.png');
-        this.load.image('grid', 'grid.png'); // 1
+        this.load.image('coin', 'coin-small.png');
     }
 
     create ()
     {
         this.add.image(400, 300, 'background');
-        this.add.image(400, 420, 'grid'); // 1
 
         const face = this.add.sprite(400, 300, 'face');
 
         face.setInteractive();
 
-        face.on('pointerdown', () => {
+        //  1 - Move particle code inside own function and add 'this.'
 
-            //  1
-            // face.setVisible(false);
+        this.createParticles();
 
-            //  2
-            // face.setTint(0xff0000);
+        face.on('pointerdown', (pointer) => {
 
-            //  3
-            face.setTint(0xff0000);
+            //  1 - add this
+            this.particles.emitParticleAt(pointer.x, pointer.y);
 
-            this.tweens.add({
-                targets: face,
-                alpha: 0
-            });
+        });
+    }
 
+    createParticles ()
+    {
+        this.particles = this.add.particles('coin');
+
+        this.particles.createEmitter({
+            angle: { min: 240, max: 300 },
+            speed: { min: 400, max: 600 },
+            gravityY: 800,
+            lifespan: 4000,
+            on: false,
+            quantity: 10,
+            scale: { min: 0.5, max: 1.0 },
+            rotate: { start: 0, end: 360, ease: 'Back.easeOut' }
         });
     }
 }
