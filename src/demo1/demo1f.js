@@ -8,8 +8,9 @@ class Example extends Phaser.Scene
     preload ()
     {
         this.load.setPath('../assets');
-        this.load.image('background', 'gradient8.png')
-        this.load.image('face', 'face.png')
+        this.load.image('background', 'gradient8.png');
+        this.load.image('face', 'face.png');
+        this.load.image('coin', 'coin-small.png'); // 1
     }
 
     create ()
@@ -20,21 +21,24 @@ class Example extends Phaser.Scene
 
         face.setInteractive();
 
-        face.on('pointerdown', () => {
+        //  1
+        const particles = this.add.particles('coin');
 
-            //  1
-            // face.setVisible(false);
+        particles.createEmitter({
+            angle: { min: 240, max: 300 },
+            speed: { min: 400, max: 600 },
+            gravityY: 800,
+            lifespan: 4000,
+            on: false,
+            quantity: 10, // 2
+            scale: { min: 0.5, max: 1.0 }, // 3
+            rotate: { start: 0, end: 360, ease: 'Back.easeOut' } // 4
+        });
 
-            //  2
-            // face.setTint(0xff0000);
+        //  1
+        face.on('pointerdown', (pointer) => {
 
-            //  3
-            face.setTint(0xff0000);
-
-            this.tweens.add({
-                targets: face,
-                alpha: 0
-            });
+            particles.emitParticleAt(pointer.x, pointer.y);
 
         });
     }

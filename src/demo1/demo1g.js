@@ -10,13 +10,35 @@ class Example extends Phaser.Scene
         this.load.setPath('../assets');
         this.load.image('background', 'gradient8.png');
         this.load.image('face', 'face.png');
+        this.load.image('grid', 'grid.png'); // 1
     }
 
     create ()
     {
         this.add.image(400, 300, 'background');
+        this.add.image(400, 420, 'grid'); // 1
 
         const face = this.add.sprite(400, 300, 'face');
+
+        face.setInteractive();
+
+        face.on('pointerdown', () => {
+
+            //  1
+            // face.setVisible(false);
+
+            //  2
+            // face.setTint(0xff0000);
+
+            //  3
+            face.setTint(0xff0000);
+
+            this.tweens.add({
+                targets: face,
+                alpha: 0
+            });
+
+        });
     }
 }
 

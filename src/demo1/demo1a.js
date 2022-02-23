@@ -8,7 +8,7 @@ class Example extends Phaser.Scene
     preload ()
     {
         this.load.setPath('../assets');
-        this.load.image('background', 'gradient8.png')
+        this.load.image('background', 'gradient8.png');
     }
 
     create ()
